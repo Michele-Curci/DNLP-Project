@@ -9,11 +9,11 @@ INPUT_FILE = f"QG/code/qg_variants.jsonl"
 OUTPUT_FILE = f"Extension 1/entity_dataset.jsonl"
 
 BIOBERT_MODEL_NAME = "Ishan0612/biobert-ner-disease-ncbi"
-CLINICAL_NER_MODEL = "bionlp/bluebert_phrase_cased_L-12_H-768_A-12_NER_BC5CDR" # Finds Diseases and Chemicals/Symptoms
 # General Domain NER Model: Recognizes Persons (PER), Organizations (ORG), Locations (LOC), and Misc. (MISC)
-GENERAL_NER_MODEL = "dslim/bert-base-NER"
+MODEL = "NeuronZero/MED-NER"
 
-GENERAL_NER_MODEL = BIOBERT_MODEL_NAME
+GENERAL_NER_MODEL = MODEL
+
 
 def setup_ner_pipeline():
     """Initializes the Named Entity Recognition pipeline."""
@@ -57,15 +57,26 @@ def extract_entities(text, ner_pipeline):
     # Note: If the pipeline is processing a single string, 'results' is a list of entity dictionaries.
     for entity_data in results:
         word = entity_data.get('word', '').strip()
-        entity_type = entity_data.get('entity_group', '') 
+        entity_type = entity_data.get('entity_group', '')
         
         # 3. Check for valid entity output
         # The aggregation_strategy="simple" usually ensures 'word' is a full entity name.
-        if word and entity_type:
-            # Format: "Entity Name (Type)"
-            entities.append(f"{word} ({entity_type})")
-        
-    return list(set(entities)) # Return unique entities
+        if word and entity_type and not entity_type.startswith('O'):
+            entities.append({
+                "text": word, 
+                "type": entity_type
+            })
+
+    unique_entities = []
+    seen = set()
+    for entity in entities:
+        # Create a hashable representation
+        entity_tuple = (entity['text'], entity['type'])
+        if entity_tuple not in seen:
+            unique_entities.append(entity)
+            seen.add(entity_tuple)
+            
+    return unique_entities
 
 def process_dataset():
     """Main function to load data, process NER, and save results."""
@@ -94,9 +105,6 @@ def process_dataset():
     # Iterate through the data and add the new 'ner_entities' field
     for i, item in enumerate(data):
         sentence = item.get('en', '') 
-
-        if i < 5: 
-         print(f"DEBUG: Processing sentence {i}: '{sentence[:50]}...' (Length: {len(sentence)})")
         
         # Run the NER extraction
         item['ner_entities'] = extract_entities(sentence, ner_pipeline)
