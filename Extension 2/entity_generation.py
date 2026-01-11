@@ -1,0 +1,123 @@
+from datasets import load_dataset
+import json
+from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
+import torch
+import os
+import pandas as pd
+
+original_dataset = load_dataset("TimSchopf/medical_abstracts")
+
+data = original_dataset["train"].select(range(100))
+data=data["medical_abstract"]
+
+OUTPUT_FILE = "entity.jsonl"
+
+GENERAL_NER_MODEL = "NeuronZero/MED-NER"
+
+def setup_ner_pipeline():
+    """Initializes the Named Entity Recognition pipeline."""
+    # Prioritize GPU (CUDA device 0)
+    device = 0 if torch.cuda.is_available() else -1
+    print(f"Using device: {'GPU' if device == 0 else 'CPU'}")
+
+    try:
+        ner_pipeline = pipeline(
+            "ner",
+            model=GENERAL_NER_MODEL,
+            tokenizer=GENERAL_NER_MODEL,
+            device=device,
+            aggregation_strategy="simple" # Groups multi-token entities (e.g., 'New York')
+        )
+        print(f"Successfully loaded NER model: {GENERAL_NER_MODEL}")
+        return ner_pipeline
+    except Exception as e:
+        print(f"Error loading NER pipeline: {e}")
+        return None
+
+def extract_entities(text, ner_pipeline):
+    """Processes text to extract and format unique entities."""
+
+    # 1. CRITICAL: Handle non-string/empty input immediately
+    if not isinstance(text, str) or not text.strip():
+        return []
+
+    try:
+        # Run the NER pipeline for a SINGLE text input
+        # The result here should be a list of dictionaries if entities are found, or an empty list []
+        results = ner_pipeline(text)
+    except Exception as e:
+        # Catch issues during processing (e.g., extremely long sentence)
+        print(f"Error processing sentence: {text[:50]}... Error: {e}")
+        return []
+
+    entities = []
+
+    # 2. Iterate through the results only if the pipeline found entities
+    # Note: If the pipeline is processing a single string, 'results' is a list of entity dictionaries.
+    for entity_data in results:
+        word = entity_data.get('word', '').strip()
+        entity_type = entity_data.get('entity_group', '')
+
+        # 3. Check for valid entity output
+        # The aggregation_strategy="simple" usually ensures 'word' is a full entity name.
+        if word and entity_type and not entity_type.startswith('O'):
+            entities.append({
+                "text": word,
+                "type": entity_type
+            })
+
+    unique_entities = []
+    seen = set()
+    for entity in entities:
+        # Create a hashable representation
+        entity_tuple = (entity['text'], entity['type'])
+        if entity_tuple not in seen:
+            unique_entities.append(entity)
+            seen.add(entity_tuple)
+
+    return unique_entities
+
+def process_dataset():
+    """Main function to load data, process NER, and save results."""
+
+    # 1. Setup NER
+    ner_pipeline = setup_ner_pipeline()
+    if not ner_pipeline:
+        return
+
+    # The 'data' variable is expected to be a list of strings (medical abstracts)
+    # We will create a new list of dictionaries, where each dict has the original abstract and its entities.
+    results_with_entities = []
+
+    for i, abstract_text in enumerate(data):
+        # Extract entities for the current abstract_text
+        all_entities = extract_entities(abstract_text, ner_pipeline)
+
+        # Remove duplicate entities (case-insensitive for text, case-sensitive for type)
+        unique_entities = []
+        seen = set()
+        for e in all_entities:
+            text_norm = e["text"].lower()
+            key = (text_norm, e["type"]) # Tuple for unique key in set
+
+            if key not in seen:
+                seen.add(key)
+                unique_entities.append({"text": e["text"], "type": e["type"]})
+
+        # Append a dictionary for the current abstract to our results list
+        results_with_entities.append({
+            "en": abstract_text,
+            "ner_entities": unique_entities
+        })
+
+    # 4. Save New Dataset
+    print(f"Saving enriched data to {OUTPUT_FILE}...")
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f_out:
+        for item_dict in results_with_entities:
+            f_out.write(json.dumps(item_dict, ensure_ascii=False) + '\n')
+
+    print("\n✅ Processing Complete.")
+    print(f"New dataset saved to {OUTPUT_FILE}")
+
+
+process_dataset()

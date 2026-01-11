@@ -1,0 +1,28 @@
+import json
+from deep_translator import GoogleTranslator
+
+translator = GoogleTranslator(source='en', target='fr')
+
+input_file = "output_ner.jsonl"
+output_file = "translation.jsonl"
+
+updated_jsonl = []
+with open(input_file, 'r', encoding='utf-8') as f:
+    for line in f:
+        data = json.loads(line.strip())
+        try:
+            translated_text = translator.translate(data['en'])
+            print("Translation: ", translated_text)
+            data['fr'] = translated_text
+        except Exception as e:
+            print(f"Translation failed for: {data['en']} with error: {e}")
+            data['fr'] = ""
+        updated_jsonl.append(data)
+
+with open(output_file, 'w', encoding='utf-8') as f:
+    for entry in updated_jsonl:
+        out_data = {
+          "id": entry.get("id", ""),
+          "en": entry.get("en", ""),
+          "fr": entry.get("fr", "")}
+        f.write(json.dumps(out_data, ensure_ascii=False) + '\n')
