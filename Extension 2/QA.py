@@ -12,13 +12,14 @@ own_cache_dir = "/content/.cache"
 os.environ["HF_HOME"] = own_cache_dir
 os.environ["HF_DATASETS"] = own_cache_dir
 
-questions_file = "output_ner.jsonl"
-backtrans_file = "bt-synonym.jsonl"
+questions_file = "Datasets/Extension 2/output_ner.jsonl"
+backtrans_file = "Datasets/Extension 2/Backtranslations/bt-synonym.jsonl"
 output_file = "synonym_answers.jsonl"
 
 def main():
-    notebook_login()
+    #notebook_login()
 
+    #Load model and tokenizer
     quantization_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
@@ -43,8 +44,6 @@ def main():
 
     with open(questions_file, 'r') as f_q, open(output_file, 'w') as f_out:
       for i, q_line in enumerate(f_q, start=1):
-          # if i < 62: continue
-          # if i > 100: break
           q_data = json.loads(q_line)
           entry_id = q_data.get("id")
           questions = q_data.get("questions", [])
@@ -54,7 +53,7 @@ def main():
           if not questions or not bk_sentence:
              continue
 
-          # build the prompt using qa_prompt
+          # build the prompt using qa_prompt 
           questions_str = json.dumps(questions, ensure_ascii=False)
           prompt = qa_prompt.replace("{{sentence}}", bk_sentence).replace("{{questions}}", questions_str)
 
@@ -75,7 +74,7 @@ def main():
           else:
                     generation = generated_questions
           try:
-            answers = eval(generation)  # converte in lista Python
+            answers = eval(generation)
           except:
             answers = [generation]
 
@@ -84,7 +83,7 @@ def main():
           print(f"> {generation}")
           print("\n======================================================\n")
 
-          # Salvataggio
+          # Save output
           out_data = {
             "id": entry_id,
             "source": bk_sentence,
@@ -92,7 +91,6 @@ def main():
             "answers": answers}
           f_out.write(json.dumps(out_data, ensure_ascii=False) + "\n")
 
-          # Svuoto cache GPU
           torch.cuda.empty_cache()
 if __name__ == "__main__":
     main()

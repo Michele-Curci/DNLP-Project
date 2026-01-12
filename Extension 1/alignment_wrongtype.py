@@ -3,8 +3,8 @@ from rapidfuzz import fuzz
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
-ORIGINAL_FILE = "source_entity_answers.jsonl"
-PERTURBED_FILE = "bt_spelling_entity_answers.jsonl"
+ORIGINAL_FILE = "Datasets/Extension 1/QA_results/source_answers.jsonl"
+PERTURBED_FILE = "Datasets/Extension 1/QA_results/bt_spelling_answers.jsonl"
 OUTPUT_FILE = "alignment_errors.jsonl"
 
 # 1. SEMANTIC MODEL
@@ -203,32 +203,3 @@ def compare_files(original_path, perturbed_path, output_path):
 
 if __name__ == "__main__":
     compare_files(ORIGINAL_FILE, PERTURBED_FILE, OUTPUT_FILE)
-
-INPUT_FILE = "word_order_errors.jsonl"
-
-def count_error_types(input_path):
-    error_counts = {}
-
-    with open(input_path, "r", encoding="utf-8") as f:
-        for line in f:
-            row = json.loads(line)
-
-            # "alignment" contiene la lista degli errori per la frase
-            alignment = row.get("alignment", [])
-
-            for err in alignment:
-                etype = err.get("error_type", "unknown")
-                error_counts[etype] = error_counts.get(etype, 0) + 1
-
-    return error_counts
-
-
-counts = count_error_types(INPUT_FILE)
-
-print("\n=== ERROR TYPE SUMMARY ===")
-for etype, count in sorted(counts.items()):
-    print(f"{etype}: {count}")
-
-with open('spelling_results.jsonl', "w", encoding="utf-8") as out:
-        for etype, count in sorted(counts.items()):
-            out.write(json.dumps(f"{etype}: {count}", ensure_ascii=False) + "\n")

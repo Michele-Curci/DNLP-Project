@@ -18,11 +18,12 @@ model_id = "google/gemma-2-9b-it"
 # ======================================
 output_path = "output_ner.jsonl"
 selected_prompt = "entity"            # <-- "vanilla", "atomic", "semantic", "entity"
-input_file = "entity.jsonl"         # <-- file input
+input_file = "Datasets/Extension 2/entity.jsonl"
 
 # Login to Hugging Face
-notebook_login()
+#notebook_login()
 
+# Load model and tokenizer
 quantization_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
@@ -41,8 +42,6 @@ model = AutoModelForCausalLM.from_pretrained(
 
 with open(input_file, 'r') as f_in, open(output_path, 'w') as f_out:
     for i, line in enumerate(f_in, start=1):
-        if i < 1: continue
-        if i > 100: break
         data = json.loads(line)
         sentence = data.get('en', None)
 
@@ -62,7 +61,7 @@ with open(input_file, 'r') as f_in, open(output_path, 'w') as f_out:
             prompt = prompt_template.replace("{{sentence}}", sentence)
         # ---------------------------------------------------------------------
 
-        # Tokenizer
+        # Tokenizer and generation
         input_ids = tokenizer(prompt, return_tensors="pt").to(model.device)
 
         with torch.no_grad():

@@ -5,7 +5,7 @@ import os
 from QG_prompt import prompts
 from huggingface_hub import notebook_login
 
-# ====================================== cache and device ======================================
+# ====================================== Cache and device ======================================
 own_cache_dir = "/content/.cache"
 os.environ["HF_HOME"] = own_cache_dir
 os.environ["HF_DATASETS"] = own_cache_dir
@@ -13,18 +13,17 @@ os.environ["HF_DATASETS"] = own_cache_dir
 model_id = "google/gemma-2-9b-it"
 
 # ======================================
-#   PARAMETRI CONFIGURABILI IN COLAB
-# ======================================
-output_path = "output_ner.jsonl"   # <-- cambia questo se vuoi
+output_path = "output_ner.jsonl" 
 selected_prompt = "entity"            # <-- "vanilla", "atomic", "semantic", "entity"
-input_file = "entity_dataset.jsonl"         # <-- file input
-vanilla_file = "vanilla_gemma-9b.jsonl"
+input_file = "Datasets/Extension 1/Perturbations/entity_dataset.jsonl"
+vanilla_file = "Datasets/Extension 1/original_files/vanilla_gemma-9b.jsonl"
 # ======================================
 
 
-# Login to Hugging Face to accedere ai modelli gated
-notebook_login()
+# Login to Hugging Face (useful when using a nootebook)
+#notebook_login()
 
+# Load model with 4-bit quantization
 quantization_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
@@ -56,8 +55,6 @@ if os.path.exists(vanilla_file):
 
 with open(input_file, 'r') as f_in, open(output_path, 'w') as f_out:
     for i, line in enumerate(f_in, start=1):
-        if i < 1: continue
-        if i > 195: break
         data = json.loads(line)
         sentence = data.get('en', None)
 
@@ -66,10 +63,10 @@ with open(input_file, 'r') as f_in, open(output_path, 'w') as f_out:
 
         data_id = data.get('id') # Get the unique ID for lookup
 
-        # Prendi il template
+        # Get the template
         prompt_template = prompts.get(selected_prompt, prompts["vanilla"])
 
-        # ------------------------- PROMPTS SPECIFICI -------------------------
+        # ------------------------- SPECIFIC PROMPTS -------------------------
         entities = data.get('ner_entities', [])
 
         if selected_prompt == "entity" and not entities:
@@ -89,14 +86,14 @@ with open(input_file, 'r') as f_in, open(output_path, 'w') as f_out:
                 prompt = prompts["vanilla"].replace("{{sentence}}", sentence)
                 print(f"ID {data_id} not found in vanilla file. Falling back to LLM (vanilla prompt)...")
 
-        if selected_prompt == "entity":
+        elif selected_prompt == "entity":
             ner_entities_str = json.dumps(entities, ensure_ascii=False)
             prompt = prompt_template.replace("{{sentence}}", sentence).replace("{{ner_entities}}", ner_entities_str)
         else:  # vanilla
             prompt = prompt_template.replace("{{sentence}}", sentence)
         # ---------------------------------------------------------------------
 
-        # Tokenizzazione
+        # Tokenizer and generation
         input_ids = tokenizer(prompt, return_tensors="pt").to(model.device)
 
         with torch.no_grad():
@@ -108,20 +105,20 @@ with open(input_file, 'r') as f_in, open(output_path, 'w') as f_out:
 
         generated = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-        # Estrarre solo la parte dopo "Questions:"
+        # Extract part after "Questions:"
         answer_start = "Questions:"
         if answer_start in generated:
             generation = generated.split(answer_start)[-1].strip()
         else:
             generation = generated
 
-        # Converti in lista Python reale
+        # Convert in Python list
         try:
             data['questions'] = eval(generation)
         except:
             data['questions'] = [generation]
 
-        # Stampa per debug
+        # Debug print
         print("\nGENERATO:\n", data['questions'])
         print("="*80)
 

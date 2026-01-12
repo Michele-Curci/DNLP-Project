@@ -4,7 +4,7 @@ import torch
 import os
 import pandas as pd
 
-INPUT_FILE = "source-bt-word_order_answers.jsonl"
+INPUT_FILE = "Datasets/Extension 1/QA_results/source-bt-word_order_answers.jsonl"
 OUTPUT_FILE = "entity_answers.jsonl"
 
 GENERAL_NER_MODEL = "NeuronZero/MED-NER"
@@ -21,7 +21,7 @@ def setup_ner_pipeline():
             model=GENERAL_NER_MODEL,
             tokenizer=GENERAL_NER_MODEL,
             device=device,
-            aggregation_strategy="simple" # Groups multi-token entities (e.g., 'New York')
+            aggregation_strategy="simple" # Groups multi-token entities
         )
         print(f"Successfully loaded NER model: {GENERAL_NER_MODEL}")
         return ner_pipeline

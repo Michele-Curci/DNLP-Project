@@ -2,7 +2,7 @@ from openai import OpenAI
 import json
 from perturbation_prompt import prompts
 
-OPENAI_API_KEY = "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" # Replace "YOUR_ACTUAL_OPENAI_API_KEY" with your valid API key
+OPENAI_API_KEY = "<YOUR_ACTUAL_OPENAI_API_KEY>"
 
 # Initialize token counters globally
 input_tokens = 0
@@ -28,12 +28,12 @@ perturbations = [
     "synonym", "word_order", "spelling", "expansion_noimpact",
     "intensifier", "expansion_impact", "omission", "alteration"
 ]
-### WARNING! change for you own part of perturbations
+
 custom_pert = ["synonym","spelling"]
 
 
 
-input_file = "translation.jsonl"
+input_file = "Datasets/Extension 2/translation.jsonl"
 
 for perturbation in custom_pert:
     print("Perturbation: ", perturbation)

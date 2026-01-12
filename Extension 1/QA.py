@@ -12,13 +12,14 @@ own_cache_dir = "/content/.cache"
 os.environ["HF_HOME"] = own_cache_dir
 os.environ["HF_DATASETS"] = own_cache_dir
 
-questions_file = "output_ner.jsonl"
-backtrans_file = "bt-alteration.jsonl"
+questions_file = "Datasets/Extension 1/QG_results/output_ner.jsonl"
+backtrans_file = "Datasets/Extension 1/Perturbations/bt-alteration.jsonl"
 output_file = "source_answers.jsonl"
 
 def main():
-    notebook_login()
+    #notebook_login()
 
+    # Load model and tokenizer
     quantization_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
@@ -43,8 +44,6 @@ def main():
 
     with open(questions_file, 'r') as f_q, open(output_file, 'w') as f_out:
       for i, q_line in enumerate(f_q, start=1):
-          if i < 1: continue
-          if i > 971: break
           q_data = json.loads(q_line)
           entry_id = q_data.get("id")
           questions = q_data.get("questions", [])
@@ -58,6 +57,7 @@ def main():
           questions_str = json.dumps(questions, ensure_ascii=False)
           prompt = qa_prompt.replace("{{sentence}}", bk_sentence).replace("{{questions}}", questions_str)
 
+          # Tokenizer and generation
           input_ids = tokenizer(prompt, return_tensors="pt").to("cuda")
           with torch.no_grad():
                         outputs = model.generate(
@@ -75,7 +75,7 @@ def main():
           else:
                     generation = generated_questions
           try:
-            answers = eval(generation)  # converte in lista Python
+            answers = eval(generation)  
           except:
             answers = [generation]
 
@@ -84,7 +84,7 @@ def main():
           print(f"> {generation}")
           print("\n======================================================\n")
 
-          # Salvataggio
+          # Save output
           out_data = {
             "id": entry_id,
             "source": bk_sentence,
@@ -92,7 +92,6 @@ def main():
             "answers": answers}
           f_out.write(json.dumps(out_data, ensure_ascii=False) + "\n")
 
-          # Svuoto cache GPU
           torch.cuda.empty_cache()
 if __name__ == "__main__":
     main()
