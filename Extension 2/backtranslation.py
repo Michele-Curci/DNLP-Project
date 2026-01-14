@@ -1,10 +1,11 @@
+## BAcktranlsation Script for Perturbed Medical Abstracts from French to English
+
 import json
 from deep_translator import GoogleTranslator
 
 translator = GoogleTranslator(source='fr', target='en')
-#perturbations = ["alteration", "expansion_impact", "expansion_noimpact", "intensifier", "omission", "spelling", "synonym", "word_order"]
+perturbations = ["alteration", "expansion_impact", "expansion_noimpact", "intensifier", "omission", "spelling", "synonym", "word_order"]
 
-perturbations = ["synonym", "spelling"]
 for perturbation in perturbations:
     input_file = f"{perturbation}.jsonl"
     output_file = f"bt-{perturbation}.jsonl"

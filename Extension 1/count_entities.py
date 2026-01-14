@@ -1,7 +1,7 @@
 import json
 from collections import Counter
 
-file_path = "word_order_entity_answers.jsonl" 
+file_path = "Datasets/Extension 1/answer_entity_results/word_order_entity_answers.jsonl"  #  change this path as needed
 
 entity_counter = Counter()
 

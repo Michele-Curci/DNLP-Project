@@ -13,7 +13,7 @@ os.environ["HF_HOME"] = own_cache_dir
 os.environ["HF_DATASETS"] = own_cache_dir
 
 questions_file = "Datasets/Extension 2/output_ner.jsonl"
-backtrans_file = "Datasets/Extension 2/Backtranslations/bt-synonym.jsonl"
+backtrans_file = "Datasets/Extension 2/Backtranslations/bt-synonym.jsonl"  # change to required backtranslation file
 output_file = "synonym_answers.jsonl"
 
 def main():
@@ -47,8 +47,8 @@ def main():
           q_data = json.loads(q_line)
           entry_id = q_data.get("id")
           questions = q_data.get("questions", [])
-          bk_sentence = bk_data.get(entry_id, {}).get("bt_pert_fr", "")
-          #bk_sentence = bk_data.get(entry_id, {}).get("en", "")
+          bk_sentence = bk_data.get(entry_id, {}).get("bt_pert_fr", "")  # <-- use this to get answers on backtranslated sentences
+          #bk_sentence = bk_data.get(entry_id, {}).get("en", "")      # <-- use this to get answers on original sentences
 
           if not questions or not bk_sentence:
              continue

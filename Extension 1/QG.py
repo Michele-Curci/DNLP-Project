@@ -1,3 +1,5 @@
+## Question Generation with Gemma-2 9B using specific prompts for NER entities
+
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import torch
 import json
@@ -122,6 +124,6 @@ with open(input_file, 'r') as f_in, open(output_path, 'w') as f_out:
         print("\nGENERATO:\n", data['questions'])
         print("="*80)
 
-        # Salva nel file
+        # Save metrics in file
         f_out.write(json.dumps(data, ensure_ascii=False) + "\n")
         torch.cuda.empty_cache()

@@ -1,3 +1,5 @@
+## Entity Generation Script for Medical Abstracts NER
+
 from datasets import load_dataset
 import json
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline

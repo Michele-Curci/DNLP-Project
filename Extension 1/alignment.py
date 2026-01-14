@@ -1,10 +1,12 @@
+## Alignment of NER entities between original and perturbed answers with error classification
+
 import json
 from rapidfuzz import fuzz
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
 ORIGINAL_FILE = "Datasets/Extension 1/QA_results/source_answers.jsonl"
-PERTURBED_FILE = "Datasets/Extension 1/QA_results/source-bt-word_order_answers.jsonl"
+PERTURBED_FILE = "Datasets/Extension 1/QA_results/source-bt-word_order_answers.jsonl"  # changed to other perturbations as needed
 OUTPUT_FILE = "word_order_errors.jsonl"
 
 # 1. SEMANTIC MODEL

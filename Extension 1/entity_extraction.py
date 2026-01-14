@@ -1,10 +1,12 @@
+## Entity Extraction using NER Model
+
 import json
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 import torch
 import os
 import pandas as pd
 
-INPUT_FILE = "Datasets/Extension 1/QA_results/source-bt-word_order_answers.jsonl"
+INPUT_FILE = "Datasets/Extension 1/QA_results/source-bt-word_order_answers.jsonl" # change this to other files in QA_results as needed or original file qg_variants.jsonl
 OUTPUT_FILE = "entity_answers.jsonl"
 
 GENERAL_NER_MODEL = "NeuronZero/MED-NER"

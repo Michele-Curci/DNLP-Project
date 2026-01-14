@@ -1,3 +1,5 @@
+### Question Answering with Gemma-2 9B using specific prompts for NER entities
+
 import torch
 import json
 import argparse
@@ -47,8 +49,8 @@ def main():
           q_data = json.loads(q_line)
           entry_id = q_data.get("id")
           questions = q_data.get("questions", [])
-          bk_sentence = bk_data.get(entry_id, {}).get("bt_pert_fr", "")
-          #bk_sentence = bk_data.get(entry_id, {}).get("en", "")
+          bk_sentence = bk_data.get(entry_id, {}).get("bt_pert_fr", "")    # <-- use this to get answers on backtranslated sentences 
+          #bk_sentence = bk_data.get(entry_id, {}).get("en", "")        # <-- use this to get answers on original sentences
 
           if not questions or not bk_sentence:
              continue

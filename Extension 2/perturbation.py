@@ -1,3 +1,5 @@
+## Perturbation Script for French Sentences
+
 from openai import OpenAI
 import json
 from perturbation_prompt import prompts
@@ -24,17 +26,15 @@ def call_nvidia_llm(prompt):
     return response_obj
 
 language = "fr"
-perturbations = [
-    "synonym", "word_order", "spelling", "expansion_noimpact",
-    "intensifier", "expansion_impact", "omission", "alteration"
-]
 
-custom_pert = ["synonym","spelling"]
 
+custom_pert = ["synonym", "word_order", "spelling", "expansion_noimpact",
+                 "intensifier", "expansion_impact", "omission", "alteration"]
 
 
 input_file = "Datasets/Extension 2/translation.jsonl"
 
+# Iterate over each perturbation type
 for perturbation in custom_pert:
     print("Perturbation: ", perturbation)
     output_file = f"{perturbation}.jsonl"
