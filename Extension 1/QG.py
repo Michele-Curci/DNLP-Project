@@ -17,7 +17,7 @@ model_id = "google/gemma-2-9b-it"
 # ======================================
 output_path = "output_ner.jsonl" 
 selected_prompt = "entity"            # <-- "vanilla", "atomic", "semantic", "entity"
-input_file = "Datasets/Extension 1/Perturbations/entity_dataset.jsonl"
+input_file = "Datasets/Extension 1/entity_dataset.jsonl"
 vanilla_file = "Datasets/Extension 1/original_files/vanilla_gemma-9b.jsonl"
 # ======================================
 

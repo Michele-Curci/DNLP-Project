@@ -15,7 +15,7 @@ os.environ["HF_HOME"] = own_cache_dir
 os.environ["HF_DATASETS"] = own_cache_dir
 
 questions_file = "Datasets/Extension 1/QG_results/output_ner.jsonl"
-backtrans_file = "Datasets/Extension 1/Perturbations/bt-alteration.jsonl"
+backtrans_file = "Datasets/Extension 1/Perturbations/bt-alteration.jsonl"  # Change to required perturbation file
 output_file = "source_answers.jsonl"
 
 def main():
