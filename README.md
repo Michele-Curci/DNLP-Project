@@ -2,182 +2,119 @@
 
 # AskQE: Question Answering as Automatic Evaluation for Machine Translation
 
-Authors: Dayeon Ki, Kevin Duh, Marine Carpuat
-
-This repository contains the code and dataset for our ACL 2025 Findings paper **AskQE: Question Answering as Automatic Evaluation for Machine Translation**.
-
-<div align="center">
-<img src="https://github.com/user-attachments/assets/b3415a65-ccac-4468-a291-07602cb95509" style="width: 15px;" alt="code"> <b><a href=https://github.com/dayeonki/askqe>Code</a></b> | <img src="https://github.com/user-attachments/assets/2bd9af9b-2182-4aef-83cd-6e9ca6189a39" style="width: 15px;" alt="data">
- <b><a>Dataset</a></b> | 
- <img src="https://github.com/user-attachments/assets/fc2ca3c2-3e78-4ca4-a208-448c0a6c7068" style="width: 15px;" alt="paper"> <b><a href=https://arxiv.org/pdf/2504.11582>Paper</a></b>
-</div>
+This repository contains the code and the dataset related to our extensions of the ASKQE framework explained in the report: **	**	Extensions of ASKQE: entity recognition and document-level shift.
 
 ## Abstract
 
-How can a monolingual English speaker determine whether an automatic translation in French is good enough to be shared? Existing MT error detection and quality estimation (QE) techniques do not address this practical scenario. We introduce AskQE, a question generation and answering framework designed to detect critical MT errors and provide actionable feedback, helping users decide whether to accept or reject MT outputs even without the knowledge of the target language. Using ContraTICO, a dataset of contrastive synthetic MT errors in the COVID-19 domain, we explore design choices for AskQE and develop an optimized version relying on LLaMA-3 70b and entailed facts to guide question generation. We evaluate the resulting system on the BioMQM dataset of naturally occurring MT errors, where AskQE has higher Kendall's Tau correlation and decision accuracy with human ratings compared to other QE metrics.
+Automatic evaluation of Machine Translation (MT) quality is a complex task, especially in sensitive domains such as medicine. ASKQE addresses this challenge by generating questions about the source text and comparing answers obtained from the original sentence and from the back-translated MT output. This work presents two extensions of the ASKQE framework aimed at enhancing both its interpretability and generalization. The first extension integrates Named Entity Recognition (NER) into the ASKQE pipeline, leveraging extracted entities both as additional context during question generation (QG) and as a tool in question answering (QA) evaluation phase. Experimental results on the synthetic medical dataset defined by ASKQE (CON- TRACTICO) show that NER-based questions exhibit trends comparable to those observed with vanilla, atomic-fact, and semantic-role questions, effectively distinguishing between minor and critical translation perturbations. Moreover, the entity-level error classification, performed computing the similarity among the entities generated from original and back-translated answers, enables a more interpretable analysis of translation errors for the different perturbations. The second extension investigates a domain shift from single sentences to longer texts, specifically medical abstracts, subject to the same perturbations introduced in CONTRACTICO. The QA evaluation results for the collection of abstracts maintain the same trend of those of single sentences, exhibiting lower similarity scores for critical perturbations. In general, the results obtained for abstracts exceed those of single sentences, benefiting from the richer contextual information they provide. Overall, the findings show that entity enrichment enhances the explainability of ASKQE and that the framework can be effectively generalized to a document domain, supporting its applicability to larger textual units.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/ebb29d1f-1cf2-43b7-a907-a5178446bf0f" width="500">
 </p>
 
-## Quick Links
 
-- [Overview](#overview)
-- [Data](#data)
-- [ContraTICO](#contratico)
-- [Question Generation](#question-generation)
-- [Question Answering](#question-answering)
-- [Backtranslation](#backtranslation)
-- [Evaluation](#evaluation)
-- [Analysis](#analysis)
-- [BioMQM](#biomqm)
+## Organization of the repository:
 
-## Overview
+The repository is divided into three folders:
 
-How can we identify critical translation errors and provide actionable feedback tohelp monolingual source speakers decide whether to accept or reject MT in high-stake contexts? We propose **AskQE**, a question generation and answering framework based on the idea that a translation is unreliable if key questions about the source text yield different answers when derived from the source or the backtranslated MT. We first generate a list of questions conditioned on the source (**QG**), generate answers for each question based on the source or the backtranslated MT output (**QA**), and compute the answer overlap. The following figure illustrates each process:
+1. Extension1: contains all the code for the first extension, “entity enrichment”
+2. Extension2: contains all the code for the second extension, “domain shift from single sentences to documents”
+3. Datasets: contains all the results file and the original files taken by ASKQE work
 
-<p align="center">
-<img width="888" alt="Screenshot 2025-03-21 at 3 31 56 PM" src="https://github.com/user-attachments/assets/c70def86-f16d-4c61-9801-3ab3622569eb" />
-</p>
+## **Extension 1**
 
-## Data
+The proposed extension adopts a structured pipeline to assess whether incorporating named entity recognition (NER) can strengthen the ASKQE framework.
 
-For our main experiments, we use [TICO-19](https://tico-19.github.io/) dataset as our testbed. To align with practical settings, we select language pairs that are high in demand in the United States healthcare system: English-Spanish (en-es), English-French (en-fr), English-Hindi (en-hi), English-Tagalog (en-tl), and English-Chinese (en-zh).
+More specifically, the goal is to determine whether NER provides a meaningful contribution to both the question-generation stage and the QA evaluation process.
 
-- Data for each language pair is in: `data/processed/{language_pair}.jsonl`
-- Translated source sentences are in: `data/google_translate/{language_pair}-gt.jsonl`
-- xCOMET scores between the source and target are in: `data/xcomet/{language_pair}-xcomet.jsonl`
+The folder is structured as follows:
 
-## ContraTICO
+1) **entity_extraction**.py contains the code used for extracting the entities both from original sentences and from the answers depending on the input file selected:
 
-Since the original TICO-19 dataset only provides English source and reference translations in the target language, we construct a dataset with synthetic errors, **ContraTICO**, to assess the impact of AskQE design in a controlled setting. We prompt GPT4o to perturb the reference translation with specific error, which results in a perturbed translation. We define eight linguistic perturbations, categorized by their level of severity into either Minor or Critical, based on the potential implications of the translation error in practice.
+    -use qg.variants.json as ‘INPUT FILE’ to extract entities from original sentences
 
-- **Minor:** These errors do not lead to loss of meaning but introduce small inaccuracies or stylistic inconsistencies that might marginally affect clarity.
-  - Spelling: Misspell one to two words.
-  - Word Order: Reorder words in the sentence.
-  - Synonym: Replace one word to its synonym.
-  - Intensifier: Modify the intensity of an adjective or an adverb (e.g., small to very small).
-  - Expansion (No Impact): Expand a word or phrase by adding contextually implied details without introducing new meaning.
-- **Critical:** These errors significantly changes the original meaning and usually appear in a highly visible or important part of the content.
-  - Expansion (Impact): Expand a word or phrase by introducing new meaning.
-  - Omission: Omit a word or phrase.
-  - Alteration: Alter a word or phrase by changing its original meaning.
+    -use files present in QA_results folder to extract entities from answers
 
-We show example for each perturbation as follows:
+2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based question generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted.
+3) **QA**.py and **QA_prompt**.py contain respectively the code and the prompt for generating answers from original sentences and back-translated ones. ‘backtranslate_file’ must be selected among the ones present in the folder Perturbations contained in Datasets-Extension1.
+4) **evaluationQA**.ipynb is a notebook containing all the ASKQE metrics used to assess the performance for all the perturbations, select as ‘predicted_file’ one among those contained in QA_results folder (depending on the perturbation you want to analyze) present in Datasets-Extension1.
+5) **count_entities**.py is used to see the types of entities extracted from answers, use as input file (depending on the perturbation you want to analyze) one among the files contained in ‘answer_entity_results’ folder present in Datasets-Extension1.
+6) **alignment**.py contains the code for the alignment between entities extracted from original and perturbed answers. The input files are contained in ‘answer_entity_results’ folder present in Datasets-Extension1, ‘PERTURBED FILE’ must be changed each time to consider the entities extracted from all the type of perturbations
+7) **count_error_type**.py is used to classify the type of entity errors, use as input file (depending on the perturbation you want to analyze) one among the files contained in ‘error_classification_results’ folder present in Datasets-Extension1.
 
-<p align="center">
-<img width="648" alt="Screenshot 2025-03-21 at 3 48 30 PM" src="https://github.com/user-attachments/assets/648ed2e2-4316-43ea-80b8-13d2653751da" />
-</p>
+Execution order of  the code for Extension1:
 
-- To perturb, run `python contratico/gpt_perturb.py` by setting the `OPENAI_API_KEY` to your personal OpenAI API key.
-- Results per language pair and perturbation are in `contratico/{language_pair}/{perturbation}.jsonl`.
+* run entity_extraction.py to generate the entities from original sentences;
+* run QG.py, QG_prompt.py to generate questions based on the entities extracted in the previous step;
+* run QA.py and QA_prompt.py to generate the answers from original sentences and back-translated ones;
+* run evaluationQA.ipynb to assess the performance of the model, in particular the similarity between original and back translated answers for all the perturbations;
+* run entity_extraction.py to generate the entities for original and perturbed answers;
+* run count_entities.py to see the types of entities extracted from answers;
+* run alignment.py to evaluate the similarity between the entities extracted from original and perturbed answers;
+* run count_error_type.py to classify the type of entity errors.
 
-## Question Generation
+## Extension 2
 
-Given a source sentence, we generate a set of questions that can be answered based on the sentence. Before generating questions, we extract information from the source on what to ask questions about and incorporate it as additional context in the prompt. Specifically, to ensure comprehensive coverage of the information from the source, we implement a two-step natural language inference (NLI) pipeline (as shown in the main figure):
+The aim of this extension is to test if the ASKQE framework could be generalized to longer pieces of text. In particular, the work focuses on a domain shift from single medical English sentences to a collection of English abstracts in the same field.
 
-1. **Fact extraction:** we prompt GPT-4o to extract atomic facts that can be inferred from the source sentence
-2. **Entailment classification:** we use an off-theshelf NLI classifier to assess the binary entailment relationship (entailed or contradictory) between each extracted fact (as the hypothesis) and the source sentence (as the premise)
+In order to replicate the ASKQE pipeline for a collection of documents, a synthetic dataset was created introducing in the original abstracts the same perturbations of the CONTRACTICO dataset considered by ASKQE.
 
-We discard facts labeled as contradictory, potentially indicating that they cannot be reliably inferred from the source. We then prompt an LLM to generate questions given the source sentence and the filtered set of entailed atomic facts.
-We also test different variants: vanilla and semantic. Results for each variant can be found in `QG/{model}/{variant}_{model}.jsonl`.
+The folder is structured as follows:
 
-To run question generation for each model,
+1) **translation**.py contains the code for translating English abstracts into French.
+2) **perturbation**.py and **perturbation_prompt**.py contain respectively the code and the prompt for generating perturbations of French abstracts
+3) **backtranslation**.py contains the code for translating perturbed French abstracts into English.
+4) **entity_generation**.py contains the code used for extracting the entities from original abstracts coming from "TimSchopf/medical_abstracts" dataset
+5) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based question generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted.
+6) **QA**.py and **QA_prompt**.py contain respectively the code and the prompt for generating answers from original abstracts and back-translated ones. ‘backtranslate_file’ must be selected among the ones (depending on the perturbation you want to analyze) in the folder Backtranslation present in Datasets-Extension2.
+7) **evaluation**.ipynb is a notebook containing all the ASKQE metrics used to assess the performance for all the perturbations, select as ‘predicted_file’ one among those contained in QA_results folder (depending on the perturbation you want to analyze) present in Datasets-Extension2.
 
-```bash
-python -u QG/code/{$LLM}.py \
-  --output_path $PATH_TO_OUTPUT_FILE \
-  --prompt $QG_VARIANT \
-```
+Execution order of  the code for Extension2:
 
-Arguments for the QG code are as follows:
+* run translation.py to translate English abstracts into French;
+* run perturbation.py and perturbation_prompt.py to generate perturbations of French abstracts;
+* run backtranslation.py to backtranslate perturbed French abstracts into English;
+* run entity_generation.py to generate the entities from original abstracts;
+* run Qg.py, QG_prompt.py to generate questions based on the entities extracted in the previous step;
+* run QA.py and QA_prompt.py to generate the answers from original abstracts and back-translated ones;
+* run evaluationQA.ipynb to assess the performance of the model, in particular the similarity between original and back translated answers for all the perturbations.
 
-- `$LLM`: Model name to use for QG.
-- `--output_path`: Save path of output file (after question generation).
-- `--prompt`: QG variant (whether vanilla / semantic / atomic).
+## **Datasets**
 
-## Question Answering
+The folder is divided in two subfolders: Extension1, Extension2.
 
-We generate answers for each question using two different contexts: source sentence and the backtranslated MT output. Results for each variant can be found in `QA/{model}/{language}-{variant}-{perturbation}.jsonl`.
+**Extension 1** contains the following folders:
 
-To run question answering for each model,
+-original_files and Perturbations contain the files taken by ASKQE.
 
-```bash
-python -u QA/code/{$LLM}.py \
-  --output_path $PATH_TO_OUTPUT_FILE \
-  --sentence_type $QA_VARIANT \
-```
+In particular, the folder ‘original_files’ include ‘qg_variants.json’ that is used to retrieve original sentences and vanilla_gemma-9b.jsonl that contains question generated in the vanilla case, used as default when it is not possible to generate questions from entities. 
 
-Arguments for the QA code are as follows:
+The folder ‘Perturbations’ contains all the perturbations of CONTRACTICO dataset built in ASKQE framework
 
-- `$LLM`: Model name to use for QA.
-- `--output_path`: Save path of output file (after question generation).
-- `--sentence_type`: QA variant (whether source or backtranslated MT output).
+-‘entity_dataset’ file contains the entities extracted from original sentences
 
-## Backtranslation
+-QG_result contains the file ‘output_ner.json’, which is the outcome of question generation, in particular it includes the questions generated using entities
 
-For backtranslation, we use the Google Translate API. We can run the backtranslation code as `python backtranslation/backtranslate.py` for all language pairs. Results for backtranslated MT output are in `backtranslation/{language_pair}/bt-{perturbation}.jsonl`.
+-QA_result contains the file with the answers extracted from original sentences (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed sentences, one output file for each perturbation
 
-## Evaluation
+-evaluation_results contains the files with the results obtained from the evaluation phase for all the perturbations, one output file for each perturbation
 
-### Baselines (QE Metrics)
+-answer_entity_results contains the file with the entities associated to answers extracted from original sentences (‘source_entity_answer.json’) and all the files with the entities extracted from answers coming from backtranslated perturbed sentences, one output file for each perturbation
 
-We further compare our method against three established QE metrics:
+-error_classification_results includes all the files reporting the types of entity-errors  made with their scores, one output file for each perturbation.
 
-- **xCOMET-QE** (evaluate the source and MT output): `python evaluation/xcomet-qe/xcomet.py`
-- **MetricX** (evaluate the source and MT output)
-- **BT-score** (evaluate the similarity between the source and backtranslated MT output using BERTScore as MT metric): `python evaluation/bt-score/run_bt.py`
+**Extension 2** includes the following folders and files:
 
-### Main evaluation
+-entity.jsonl file contains the entities extracted from original abstracts
 
-For running overall evaluation on AskQE outputs (the results are in each directory):
+-perturbation_results folder includes all perturbed French abstract, one output file for each type of perturbation
 
-- **SBERT:** `python evaluation/sbert/sbert.py`
-- **String comparison metrics** (F1, EM, BLEU, chrF): `python evaluation/string-comparison/string_comparison.py`
+-translation.jsonl file contains the translation of English abstracts into French
 
-### Desiderata evaluation
+-Backtranslations folder includes the backtranslation from French to English of perturbed abstracts, one output file for each perturbation
 
-We define five quality desiderata that measures the correctness, diversity, readability, and answerability of the questions.
+-QG_result contains the file ‘output_ner.json’, which is the outcome of question generation, in particular it includes the questions generated from original abstracts using entities
 
-- **Empty:** `python evaluation/desiderata/i_avg_questions.py`
-- **Duplicate:** `python evaluation/desiderata/i_duplicate.py`
-- **Diversity:** `python evaluation/desiderata/i_diversity.py`
-- **Answerability:** `python evaluation/desiderata/q_answerability.py`
-- **Readability:** `python evaluation/desiderata/q_readability.py`
+-QA_result contains the file with the answers extracted from original abstracts (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed abstracts, one output file for each perturbation
 
-## Analysis
-
-We provide code used for analysis in `analysis/`. To run question categorization, run `python analysis/question_categorization.py` by setting the `OPENAI_API_KEY` to your personal OpenAI API key.
-
-## BioMQM
-
-BIOMQM is a biomedical domain MT dataset with error annotations by professional translators based on the multidimensional quality metrics (MQM). We extend analysis with the ContraTICO dataset with the BIOMQM dataset with more naturally occurring translation errors and additional language pairs.
-
-- **Data:** `biomqm/dev_with_backtranslation.jsonl`
-- **AskQE code:** `biomqm/askqe`
-- **Baseline code** (QE metrics): `biomqm/baselines`
-- **Human simulation:** Both code and results can be found in `biomqm/human_simulation`
-
-## Citation
-
-```
-@inproceedings{ki-etal-2025-askqe,
-    title = "{A}sk{QE}: Question Answering as Automatic Evaluation for Machine Translation",
-    author = "Ki, Dayeon  and
-      Duh, Kevin  and
-      Carpuat, Marine",
-    editor = "Che, Wanxiang  and
-      Nabende, Joyce  and
-      Shutova, Ekaterina  and
-      Pilehvar, Mohammad Taher",
-    booktitle = "Findings of the Association for Computational Linguistics: ACL 2025",
-    month = jul,
-    year = "2025",
-    address = "Vienna, Austria",
-    publisher = "Association for Computational Linguistics",
-    url = "https://aclanthology.org/2025.findings-acl.899/",
-    doi = "10.18653/v1/2025.findings-acl.899",
-    pages = "17478--17515",
-    ISBN = "979-8-89176-256-5",
-}
-```
+-evaluation_results contains the files with the results obtained from the evaluation phase for all the perturbations, one output file for each perturbation
