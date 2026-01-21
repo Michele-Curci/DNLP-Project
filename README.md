@@ -2,7 +2,7 @@
 
 # AskQE: Question Answering as Automatic Evaluation for Machine Translation
 
-This repository contains the code and the dataset related to our extensions of the ASKQE framework explained in the report: **	**	Extensions of ASKQE: entity recognition and document-level shift.
+This repository contains the code and the dataset related to our extensions of the ASKQE framework explained in the report: Extensions of ASKQE: entity recognition and document-level shift.
 
 ## Abstract
 
