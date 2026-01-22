@@ -31,9 +31,9 @@ The folder is structured as follows:
 
 1) **entity_extraction**.py contains the code used for extracting the entities both from original sentences and from the answers depending on the input file selected:
 
-    -use qg.variants.json as ‘INPUT FILE’ to extract entities from original sentences
+    * use qg.variants.json as ‘INPUT FILE’ to extract entities from original sentences
 
-    -use files present in QA_results folder to extract entities from answers
+    * use files present in QA_results folder to extract entities from answers
 
 2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based question generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted.
 3) **QA**.py and **QA_prompt**.py contain respectively the code and the prompt for generating answers from original sentences and back-translated ones. ‘backtranslate_file’ must be selected among the ones present in the folder Perturbations contained in Datasets-Extension1.
