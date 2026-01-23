@@ -12,7 +12,7 @@ own_cache_dir = "/content/.cache"
 os.environ["HF_HOME"] = own_cache_dir
 os.environ["HF_DATASETS"] = own_cache_dir
 
-questions_file = "Datasets/Extension 2/output_ner.jsonl"
+questions_file = "Datasets/Extension 2/QG_results/output_ner.jsonl"
 backtrans_file = "Datasets/Extension 2/Backtranslations/bt-synonym.jsonl"  # change to required backtranslation file
 output_file = "synonym_answers.jsonl"
 
