@@ -34,7 +34,7 @@ The folder is structured as follows:
 
     * use files present in 'QA_results' folder to extract entities from answers.
 
-2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based question generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted in step 1).
+2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based question generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted in step 1.
 3) **QA**.py and **QA_prompt**.py contain respectively the code and the prompt for generating answers from original sentences and back-translated ones. ‘backtranslate_file’ must be selected among the ones present in the folder 'Perturbations' contained in 'Datasets/Extension1'.
 4) **evaluationQA**.ipynb is a notebook containing all the ASKQE metrics used to assess the performance for all the perturbations, select as ‘predicted_file’ one among those contained in QA_results folder (depending on the perturbation you want to analyze) present in 'Datasets/Extension1'.
 5) **count_entities**.py is used to see the types of entities extracted from answers, use as input file (depending on the perturbation you want to analyze) one among the files contained in ‘answer_entity_results’ folder present in 'Datasets/Extension1'.
