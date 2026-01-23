@@ -17,9 +17,9 @@ Automatic evaluation of Machine Translation (MT) quality is a complex task, espe
 
 The repository is divided into three folders:
 
-1. Extension1: contains all the code for the first extension, “entity enrichment”
-2. Extension2: contains all the code for the second extension, “domain shift from single sentences to abstracts”
-3. Datasets: contains all the results file and the original files taken by ASKQE work
+1. Extension1: contains all the code for the first extension, “entity enrichment”.
+2. Extension2: contains all the code for the second extension, “domain shift from single sentences to abstracts”.
+3. Datasets: contains all the results file and the original files taken by ASKQE work.
 
 ## **Extension 1**
 
@@ -32,7 +32,7 @@ The folder is structured as follows:
 
     * use 'qg.variants.json' as ‘INPUT FILE’ to extract entities from original sentences;
 
-    * use files present in QA_results folder to extract entities from answers.
+    * use files present in 'QA_results' folder to extract entities from answers.
 
 2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based question generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted in step 1).
 3) **QA**.py and **QA_prompt**.py contain respectively the code and the prompt for generating answers from original sentences and back-translated ones. ‘backtranslate_file’ must be selected among the ones present in the folder 'Perturbations' contained in 'Datasets/Extension1'.
