@@ -34,7 +34,7 @@ The folder is structured as follows:
 
     * use files present in 'QA_results' folder to extract entities from answers.
 
-2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based question generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted in step 1.
+2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based questions generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted in step 1.
 3) **QA**.py and **QA_prompt**.py contain respectively the code and the prompt for generating answers from original sentences and back-translated ones. ‘backtranslate_file’ must be selected among the ones present in the folder 'Perturbations' contained in 'Datasets/Extension1'.
 4) **evaluationQA**.ipynb is a notebook containing all the ASKQE metrics used to assess the performance for all the perturbations, select as ‘predicted_file’ one among those contained in QA_results folder (depending on the perturbation you want to analyze) present in 'Datasets/Extension1'.
 5) **count_entities**.py is used to see the types of entities extracted from answers, use as input file (depending on the perturbation you want to analyze) one among the files contained in ‘answer_entity_results’ folder present in 'Datasets/Extension1'.
@@ -60,7 +60,7 @@ In order to replicate the ASKQE pipeline for a collection of documents, a synthe
 The folder is structured as follows:
 
 1) **entity_generation**.py contains the code used for extracting the entities from original abstracts coming from "TimSchopf/medical_abstracts" dataset.
-2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based question generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted.
+2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based questions generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted.
 3) **translation**.py contains the code for translating original English abstracts into French.
 4) **perturbation**.py and **perturbation_prompt**.py contain respectively the code and the prompt for generating perturbations of French abstracts.
 5) **backtranslation**.py contains the code for translating perturbed French abstracts back into English.
@@ -83,11 +83,11 @@ The folder is divided in two subfolders: Extension1, Extension2.
 
 **Extension 1** contains the following folders:
 
-* **original_files** and **Perturbations** contain the files taken by ASKQE. In particular, the folder ‘original_files’ include ‘qg_variants.json’ that is used to retrieve original sentences and 'vanilla_gemma-9b.jsonl' that contains question generated in the vanilla case, used as default when it is not possible to generate questions from entities. The folder ‘Perturbations’ contains all the perturbations of CONTRACTICO dataset built in ASKQE framework.
+* **original_files** and **Perturbations** contain the files taken by ASKQE. In particular, the folder ‘original_files’ include ‘qg_variants.json’ that is used to retrieve original sentences and 'vanilla_gemma-9b.jsonl' that contains questions generated in the vanilla case, used as default when it is not possible to generate questions from entities. The folder ‘Perturbations’ contains all the perturbations of CONTRACTICO dataset built in ASKQE framework.
 
 * **entity_dataset** file contains the entities extracted from original sentences.
 
-* **QG_result** contains the file ‘output_ner.json’, which is the outcome of question generation, in particular it includes the questions generated using entities.
+* **QG_result** contains the file ‘output_ner.json’, which is the outcome of questions generation, in particular it includes the questions generated using entities.
 
 * **QA_result** contains the file with the answers extracted from original sentences (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed sentences, one output file for each perturbation.
 
@@ -107,7 +107,7 @@ The folder is divided in two subfolders: Extension1, Extension2.
 
 * **Backtranslations** folder includes the backtranslation from French to English of perturbed abstracts, one output file for each perturbation.
 
-* **QG_result** contains the file ‘output_ner.json’, which is the outcome of question generation, in particular it includes the questions generated from original abstracts using entities.
+* **QG_result** contains the file ‘output_ner.json’, which is the outcome of questions generation, in particular it includes the questions generated from original abstracts using entities.
 
 * **QA_result** contains the file with the answers extracted from original abstracts (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed abstracts, one output file for each perturbation.
 
