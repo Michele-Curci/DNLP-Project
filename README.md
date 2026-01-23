@@ -101,13 +101,13 @@ The folder is divided in two subfolders: Extension1, Extension2.
 
 * **entity.jsonl** file contains the entities extracted from original abstracts.
 
+* **QG_result** contains the file ‘output_ner.json’, which is the outcome of questions generation, in particular it includes the questions generated from original abstracts using entities.
+
 * **perturbation_results** folder includes all perturbed French abstracts, one output file for each type of perturbation.
 
 * **translation.jsonl** file contains the translation of English abstracts into French.
 
 * **Backtranslations** folder includes the backtranslation from French to English of perturbed abstracts, one output file for each perturbation.
-
-* **QG_result** contains the file ‘output_ner.json’, which is the outcome of questions generation, in particular it includes the questions generated from original abstracts using entities.
 
 * **QA_result** contains the file with the answers extracted from original abstracts (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed abstracts, one output file for each perturbation.
 
