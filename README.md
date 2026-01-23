@@ -36,7 +36,7 @@ The folder is structured as follows:
 
 2) **QG**.py, **QG_prompt**.py contain respectively the code and the prompt for NER-based questions generation, the selected prompt is equal to ‘entity’ to generate questions using the entities extracted in step 1.
 3) **QA**.py and **QA_prompt**.py contain respectively the code and the prompt for generating answers from original sentences and back-translated ones. ‘backtranslate_file’ must be selected among the ones present in the folder 'Perturbations' contained in 'Datasets/Extension1'.
-4) **evaluationQA**.ipynb is a notebook containing all the ASKQE metrics used to assess the performance for all the perturbations, select as ‘predicted_file’ one among those contained in QA_results folder (depending on the perturbation you want to analyze) present in 'Datasets/Extension1'.
+4) **evaluationQA**.ipynb is a notebook containing all the ASKQE metrics used to assess the performance for all the perturbations, select as ‘predicted_file’ one among those contained in 'QA_results' folder (depending on the perturbation you want to analyze) present in 'Datasets/Extension1'.
 5) **count_entities**.py is used to see the types of entities extracted from answers, use as input file (depending on the perturbation you want to analyze) one among the files contained in ‘answer_entity_results’ folder present in 'Datasets/Extension1'.
 6) **alignment**.py contains the code for the alignment between entities extracted from original and perturbed answers. The input files are contained in ‘answer_entity_results’ folder present in 'Datasets/Extension1', ‘PERTURBED FILE’ must be changed each time to consider the entities extracted from all the type of perturbations.
 7) **count_error_type**.py is used to classify the type of entity errors, use as input file (depending on the perturbation you want to analyze) one among the files contained in ‘error_classification_results’ folder present in 'Datasets/Extension1'.
@@ -87,9 +87,9 @@ The folder is divided in two subfolders: Extension1, Extension2.
 
 * **entity_dataset** file contains the entities extracted from original sentences.
 
-* **QG_result** contains the file ‘output_ner.json’, which is the outcome of questions generation, in particular it includes the questions generated using entities.
+* **QG_results** contains the file ‘output_ner.json’, which is the outcome of questions generation, in particular it includes the questions generated using entities.
 
-* **QA_result** contains the file with the answers extracted from original sentences (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed sentences, one output file for each perturbation.
+* **QA_results** contains the file with the answers extracted from original sentences (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed sentences, one output file for each perturbation.
 
 * **evaluation_results** contains the files with the results obtained from the evaluation phase for all the perturbations, one output file for each perturbation.
 
@@ -101,7 +101,7 @@ The folder is divided in two subfolders: Extension1, Extension2.
 
 * **entity.jsonl** file contains the entities extracted from original abstracts.
 
-* **QG_result** contains the file ‘output_ner.json’, which is the outcome of questions generation, in particular it includes the questions generated from original abstracts using entities.
+* **QG_results** contains the file ‘output_ner.json’, which is the outcome of questions generation, in particular it includes the questions generated from original abstracts using entities.
 
 * **perturbation_results** folder includes all perturbed French abstracts, one output file for each type of perturbation.
 
@@ -109,6 +109,6 @@ The folder is divided in two subfolders: Extension1, Extension2.
 
 * **Backtranslations** folder includes the backtranslation from French to English of perturbed abstracts, one output file for each perturbation.
 
-* **QA_result** contains the file with the answers extracted from original abstracts (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed abstracts, one output file for each perturbation.
+* **QA_results** contains the file with the answers extracted from original abstracts (‘source_answer.json’) and all the files with the answers extracted from backtranslated perturbed abstracts, one output file for each perturbation.
 
 * **evaluation_results** contains the files with the results obtained from the evaluation phase for all the perturbations, one output file for each perturbation.
